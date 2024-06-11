@@ -28,7 +28,7 @@
 # User-defined thread
  Two ways of creating a Thread: extending Thread class or implementing Runnable interface. 
 
- 1. creating a thread as a child of the Thread class
+ ## creating a thread as a child of the Thread class
 
  Step 1: Create a class that extends the Thread class: 
 
