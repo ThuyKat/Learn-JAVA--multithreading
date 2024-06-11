@@ -26,6 +26,51 @@
 6. One common way to ensure the main thread waits for child threads to complete is by using the join() method. This method blocks the main thread until the specified child thread terminates.
 
 # User-defined thread
+ Two ways of creating a Thread: extending Thread class or implementing Runnable interface. 
 
+ 1. creating a thread as a child of the Thread class
 
-# Two ways of creating a Thread: extending Thread class or implementing Runnable interface
+ Step 1: Create a class that extends the Thread class: 
+
+ ```java
+ public class A extends Thread {
+
+ }
+ ```
+
+ Step 2: Override the run method of the Thread class. This is the function that we want this new child thread to run. Note that: to override any method, we needs to keep the method definition as it is, no changing to parameters or return type. 
+
+ ```java
+ public class A extends Thread {
+    @Override
+    public void run(){
+        //code
+    }
+ }
+ ```
+Step 3: Write logic of run() method . 
+
+Step 4: In main method, create an instance of the newly created child Thread class
+
+```java
+A t1 = new A();
+```
+
+Now we want to inform JVM that t1 is the new thread created and you can execute it when you are free. To inform JVM, we call .start() method of the Thread class
+
+Step 5: start the thread : t1.start() 
+
+When you start() the thread t1.start() multiple times, Illegal Thread State Exception will be thrown. This is caused inside the .start() method by: 
+
+```java
+...
+if (threadStatus != 0)
+            throw new IllegalThreadStateException();
+
+```
+
+when you create a thread, the thread has "new" status. It becomes 0 when you start it. When you start() again, the status is modified from 0, so it results in !=0 and exeption is thrown. 
+
+If no exeption is thown, private native void start0() is evoked. The return type " native" indicates that this methods involves directly with the CPU and memory allocation related. Start0 () is responsible for creating your new thread and evoke run() method. Test: if we evoke run() diretly, e.g: t1.run() without going through t1.start() --> no new thread is created. 
+
+The run() method we overridden in the thread child class is executed instead of the parents' run method. 
