@@ -148,3 +148,31 @@ Thread t  = new Thread ("thread1");
 t.setPriority(10);
 ```
 3. Group: provide the parents' thread from which this thread is created.
+
+![alt text](SS/image.png)
+
+# MULTIPLE THREADS
+
+Questions: calculate and return factorial of a number given in a list
+
+Using lambda expresion, we have solution : 
+
+![alt text](SS/image1.png)
+
+1. Now if we give bigger number list : {1000,2000,3000...10000}. Results will be 0 because their values come out of Integer range. 
+
+2. To fix this, we need to change from int to BigInteger type
+
+![alt text](SS/image2.png)
+
+3. However we can notice that time taken to execute increased significantly. To reduce the time taken, we use parallel stream
+
+```java
+input.stream().parallel().forEach(num ->{
+//		int res = factorial(num);
+		BigInteger res = factorial(num);
+		System.out.println("factorial of "+ num + " is "+ res); 
+	});
+```
+
+Time taken to perform now reduced from over 500 to 365 milliseconds!
