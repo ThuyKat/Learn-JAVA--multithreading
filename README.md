@@ -50,7 +50,7 @@
  ```
 Step 3: Write logic of run() method . 
 
-Step 4: In main method, create an instance of the newly created child Thread class
+Step 4: In main method, create an instance of the newly created child Thread class. At this stage, an instance of Thread class is created but still a single thread is running only which is the main thread
 
 ```java
 A t1 = new A();
@@ -74,3 +74,77 @@ when you create a thread, the thread has "new" status. It becomes 0 when you sta
 If no exeption is thown, private native void start0() is evoked. The return type " native" indicates that this methods involves directly with the CPU and memory allocation related. Start0 () is responsible for creating your new thread and evoke run() method. Test: if we evoke run() diretly, e.g: t1.run() without going through t1.start() --> no new thread is created. 
 
 The run() method we overridden in the thread child class is executed instead of the parents' run method. 
+
+After start() is called, two threads are running. Thread scheduler will handle two threads simultaneously
+
+In order to know which Thread are running, we use:
+
+```java
+System.out.println(Thread.currentThread().getName())
+
+```
+
+ADVANTAGES of creating a threat by extending the thread class:  We do not need to create object of thread class in main
+
+However, it will be less flexible if later we would like the implemented class to extend other class than Thread. 
+
+## creating a thread as implementation of Runnable interface
+
+Step 1: Create a class that implements Runnable interface
+
+```java
+ public class B implements Runnable {
+
+ }
+ ```
+
+Runnable is a functional interface with only 1 abstract method : run()
+
+Step 2: Override the run() method
+
+Step 3: Write the logic of run() method
+
+Step 4: In main method, create an object of the class we created in previous step
+
+```java
+main() {
+    B t2 = new B();
+}
+```
+
+To inform JVM about this new Thread and whenever possible execute this new thread. Since Runnable does not have any .start() method to create new thread like Thread class, we have to create an instance of Thread class to use .start()
+
+Step 5: Create an instance of Thread class and supply the runnable instance we created in step 4 as its argument
+
+Step 6: Start the thread
+
+```java
+main() {
+    B t2 = new B();
+    Thread thread = new Thread(t2);
+    t2.start()
+}
+```
+
+thread will be responsible for execute the task you wrote inside the Runnable implementation class. 
+
+Whenever you provide runnable task, that task is assigned to FieldHolder in its constructor which assign your task to its task parameter
+
+## If we have two threads both execute the same task, is there any order that threads start? 
+
+The second thread.start() is not happening after the first thread.start() because it does not wait for the first one to finish to start its operation. 
+
+## THREAD - PROPERTIES
+
+1. Name: this is the thread's name and we can specify this as argument when we call an instance of the Thread class. For example: 
+
+```java
+Thread t  = new Thread ("thread1");
+```
+
+2. Priority: Every thread has priority spanning from 1 to 10. The default value if we do not specify this property is 5. Thread has higher priority run first. We can specify this: 
+
+```java
+t.setPriority(10);
+```
+3. Group: provide the parents' thread from which this thread is created.
