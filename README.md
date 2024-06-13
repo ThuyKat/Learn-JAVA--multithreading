@@ -155,7 +155,7 @@ t.setPriority(10);
 
 Questions: calculate and return factorial of a number given in a list
 
-Using lambda expresion, we have solution : 
+***Using stream and lambda expresion, we have solution : ***
 
 ![alt text](SS/image1.png)
 
@@ -176,3 +176,6 @@ input.stream().parallel().forEach(num ->{
 ```
 
 Time taken to perform now reduced from over 500 to 365 milliseconds!
+
+*** implementing solution using Runnable ***
+
