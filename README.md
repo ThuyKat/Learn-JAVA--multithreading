@@ -15,7 +15,12 @@
 
 1. In Java, it can be achieved via Thread class. 
 2. Thread scheduler decides which thread to run and which thread to wait
-3. All of this are pretty similar to process scheduler in your operating system. 
+3. All of this are pretty similar to process scheduler in your operating system.
+4. When processes are swapping so fast, we think multiple processes are running in parallel. However it is actually concurrent running. Parallelism is only possible with mulitple cores eithier on single or multiple processors.This is because each thread is a process wihci runs on a core and one core can accommodate only one thread at a time. In order to check how many available processors: 
+
+```java
+Runtime.getRuntime().availableProcessors();
+```
 
 # Main thread
 1. When Java program starts, one thread is created by JVM automatically and it run immediately. This thread is "main" thread. When we write a program and run without creating a new thread, we are running in single thread environment.
@@ -25,7 +30,7 @@
 5. Various shutdown actions such as: cleaning up resources ( closing files, releasing network connections); ensuring all child threads are terminated gracefully; performing final logging or cleanup tasks
 6. One common way to ensure the main thread waits for child threads to complete is by using the join() method. This method blocks the main thread until the specified child thread terminates.
 
-# Two type of thread
+# Two types of thread
 
 1. User-defined thread: is responsible for the execution of something required for your program such as calculation, get output, etc.
 
@@ -43,6 +48,8 @@ thread.setDaemon(true);
 - When to use daemon thread: when we don't want the task to block the main task in execution. 
 
 - One thing to note is that if we use thread.sleep() in other threads and let the daemon thread happens then it will happen before those other threads. Otherwise, if daemon has not completed its task when the main thread completed, it will keep running and not blocking the main thread, even in the case that daemon might throw an exeption. Daemon can complete its task either before or after main, but it wont affect main's operation. 
+
+- Daemon threads are also called service provider threads which provide service to the user thread
 
 # User-defined thread
  Two ways of creating a Thread: extending Thread class or implementing Runnable interface. 
@@ -172,6 +179,27 @@ t.setPriority(10);
 
 # MULTIPLE THREADS
 
+## When to use multi-threading: I/O tasks vs CPU intensive tasks
+
+- I/O task : for every task, there is a certain waiting time. When dealing with I/O tasks, it makes sense to have more concurrency/parallelism.
+- CPU intensive task: very little waiting time. When dealing with just CPU intensive tasks, increasing thread size beyond the CPU cores will degrade the performance
+
+In production environment, CPU cores are not limited to just 8 cores because in each core there are logical cores as well. This type of hardware allows hyperthreading. Depending on how many logical cores that the computer system have, we can define the maximum number of threads. 
+
+- OPTIMAL NUMBER OF THREADS: is calculated using this formula
+
+* I/O Bound Tasks: 
+
+Threads = number of cores * ( 1 + wait time / service time)
+
+* CPU Bound Tasks:
+
+Threads = number of cores + 1 
+
+Note: wait time is close to 0 in this case
+
+# MULTI-THREADING DEMONSTRATION: 
+
 Questions: calculate and return factorial of a number given in a list
 
 ## Using stream and lambda expresion, we have solution : 
@@ -237,3 +265,61 @@ As a result, the end time calculation will not be executed until we start all th
 8. We can also enhance the performance by using parallel streams instead of iterating sequentially
 
 ![alt text](SS/image6.png)
+
+# THREAD POOL 
+
+This is another way of creating multiple threads environment. Instead of manually creating threads, we will use Executor Service: 
+
+![alt text](SS/image7.png)
+
+
+- When user sends requests, blocking queue holds the requests unless and untill there is a thread in Thread pool can pick up and perform the task. For example, in the thread pool, if thread 1 is in waiting stage, thread 1 will pick up a task from the blocking queue and concurrently handle two tasks. 
+- When you create an executable service, you can specify number of threads you need for all the tasks you would submit to the executor service ( corepoolsize and maxpoolsize), also you can specify the size of the blocking queue - how many tasks can wait in the blocking queue (arrayblockingqueue, linkedblockingqueue,etc)
+
+- corepoolsize: is the number of threads that you want to create
+- maxpoolsize: you can expand your thread pool until this size if your threadpool is full and also is your blocking queue
+- keepalivetime: if no task is assigned to a thread in the extended part of the threadpool, it will get terminated. 
+
+## FixedThreadPool
+
+![alt text](SS/image8.png)
+
+- maxpoolsize = corepoolsize so keepAliveTime = 0
+- time uit : seconds
+- blocking queue : LinkedBlockingQueue - dynamic size which accepts all requests. Requests will never get rejected. 
+
+The previous question can be solved using ExecutorService and FixedThreadPool:
+
+![alt text](SS/image9.png)
+
+- ex.submit() takes either Callable or Runnable as its parameter. Runnable is used for methods which do not have any return ( void return type). Callable is used when you want to return some value
+
+## SingleThreadExecutor : used when you want to create just 1 thread and have sequential actions.
+
+For example, if you want to solve the previous question with a single thread, you can either have: 
+
+```java
+ExecutorService ex = Executors.newSingleThreadExecutor();
+
+```
+
+OR: 
+
+```java
+ExecutorService ex = Executors.newFixedThreadPool(1);
+```
+
+## CachedThreadPool
+
+- corepoolsize: 0
+- maxpoolsize: Integer.MAX_VALUE
+- keepAliveTime: 60
+- unit: SECONDS
+- BlockingQueue : Synchronousqueue
+
+This type of Thread Pool keeps expanding to the maximum value of Integer type depends on number of requests sent from user.
+
+However, Synchronousqueue can only hold 1 request and until the request gets picked up by the ThreadPool, this type of blocking queue will not hold more any request. 
+
+
+
