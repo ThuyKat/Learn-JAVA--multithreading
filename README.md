@@ -155,7 +155,7 @@ t.setPriority(10);
 
 Questions: calculate and return factorial of a number given in a list
 
-***Using stream and lambda expresion, we have solution : ***
+## Using stream and lambda expresion, we have solution : 
 
 ![alt text](SS/image1.png)
 
@@ -177,5 +177,44 @@ input.stream().parallel().forEach(num ->{
 
 Time taken to perform now reduced from over 500 to 365 milliseconds!
 
-*** implementing solution using Runnable ***
+## implementing solution using Runnable 
 
+1. Instead of writting function factorial() in main as above, we create a class implementing Runnable
+
+![alt text](SS/image3.png)
+
+2. In main, instead of calling factorial() function, we implement steps to create an instance of the Runnable implemented class and Thread class.
+
+![alt text](SS/image4.png)
+
+3. As we can see in the results above, multiple threads are created but it runs without any order. Similarly, the main thread will not wait for all spawn threads to complete their operations before it starts. In terms of Lentency, if we place start_time and end_time in main, it will not give the accurate result of how much time does it takes to complete the whole process. 
+
+4. In order to make Main thread waits for spawn threads, we use .join() method
+
+![alt text](SS/image5.png)
+
+When you join(), the current thread will not execute until the thread on which the .join() method was called has completed its execution. This is particularly useful when you need to ensure that certain threads have finished their tasks before proceeding further in the program
+
+5. Notes that even though the order of threads are not mixed up in the screenshot, the join() method only ensures that the main thread waits for spawn threads, but does not influence the order in which spawn threads execute their tasks. The execution order of the threads is determined by the JVM and the underlying OS's thread scheduler, not by the order of the join() calls. 
+
+6. One disadvantage of using join() is that since we make the main thread to wait and each spawn thread execute in start() then join() sequence, it takes more time or increase the lentency of the program. 
+
+7. Now to fix that, we want to make this process parallel: start() all the threads then join() later: start() start() stat() ... join() join()...join(). 
+First, we will create an ArrayList of threads and whatever thread we initiate, we add to that list:
+
+```java
+Thread t = new Thread();
+threads.add(t);
+```
+
+Then secondly, instead of using join() after start(), we create another stream to join all the threads we have started in the thread list. 
+
+```java
+thread.stream().forEach(thread -> thread.join());
+```
+
+As a result, the end time calculation will not be executed until we start all threads and complete all of their operations.
+
+8. We can also enhance the performance by using parallel streams instead of iterating sequentially
+
+![alt text](SS/image6.png)
