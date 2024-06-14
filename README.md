@@ -321,5 +321,19 @@ This type of Thread Pool keeps expanding to the maximum value of Integer type de
 
 However, Synchronousqueue can only hold 1 request and until the request gets picked up by the ThreadPool, this type of blocking queue will not hold more any request. 
 
+## ScheduledThreadPool
 
+- corepoolsize : n
+- maxpoolsize: Integer.MAX_VALUE
+- keepAliveTime: 10
+- TimeUnit: SECONDS
+- BlockingQueue: DelayedWorkQueue
+
+- The DelayedWorkQueue hold the task for a given time before the ThreadPool pick it up. It is typically used in cases where tasks need to be executed after a certain delay relative to when they were submited or based on specific conditions. It is not primarily about managing threads but rather managing the timing of task execution
+- Note that the return type of this Method is **ScheduledExecutorService** instead of normal ExecutorService like previous methods. This ScheduledExecutorService is a child of ExecutorService which inherited .submit() method from its parents and also have .schedule( runnableTask,delay_time, TimeUnit.SECONDS) of its own
+- A scheduled thread pool is designed for scheduling tasks to run periodically or after a delay, provides flex in terms of scheduling recurring tasks, fixed interval tasks or tasks with timing patterns like every hour, every  day, etc..
+
+**DEMONSTRATION OF SCHEDULED EXECUTOR SERVICE**
+
+![alt text](SS/image10.png)
 
