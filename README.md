@@ -405,6 +405,8 @@ Thread -2 ( gate 2) :
 
 Since data is fetched to these two threads at the same time, it wont get updated correctly and both thread returns stored value of 6 people. This results in less counts than expected !
 
+**fixing the issue with synchronized**
+
 5. To avoid this, we will use synchronized() keywords to allow only 1 thread execute run() logic of the task at a time. The synchronized mechanism in Java is not a method but rather a keyword that provides a way to synchronize blocks of code or methods to control access by multiple threads. The synchronized keyword is handled by JVM and the Java language itself. When compiled, the Java code containing synchronized blocks or methods includes special bytecode instructions that manage the lock acquisition and release 
 Bytecode Instruction: 
 * monitorenter: acquires the lock
@@ -499,4 +501,65 @@ public class LibraryCountTask implements Runnable{
 
 Now the results return 20000 people correctly.
 
+**fixing the issue with atomic data type**
+
+1. Instead of using "private int count;", now we can change it to " private AtomicInteger count;"
+
+2. In constructor: 
+
+```java
+count = new AtomicInteger(0);
+```
+
+3. In getCount() method: 
+
+```java
+return count.get();
+
+```
+4. In run() method: 
+
+```java
+count.addAndGet(delta: 1);
+
+```
+
+FULL CODE: 
+
+```java
+package ExecutorService;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class LibraryCountTask implements Runnable{
+
+//	private int count;
+	private AtomicInteger count;
+	
+	public LibraryCountTask() {
+//		count = 0;
+		count = new AtomicInteger(0);
+	}
+	
+	public int getCount() {
+//		return count;
+		return count.get();
+	}
+	
+	@Override
+	public void run() {
+//		incrementCount();
+		count.addAndGet(1);
+		
+	}
+
+//	private void incrementCount() {
+//		synchronized(this) {
+//			count++;
+//		}
+//		
+//	}
+
+}
+```
 ## Stale data/ data inconsistency
