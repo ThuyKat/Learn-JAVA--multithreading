@@ -186,7 +186,7 @@ t.setPriority(10);
 
 In production environment, CPU cores are not limited to just 8 cores because in each core there are logical cores as well. This type of hardware allows hyperthreading. Depending on how many logical cores that the computer system have, we can define the maximum number of threads. 
 
-- OPTIMAL NUMBER OF THREADS: is calculated using this formula
+**OPTIMAL NUMBER OF THREADS: is calculated using this formula**
 
 * I/O Bound Tasks: 
 
