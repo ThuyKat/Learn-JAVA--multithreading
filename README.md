@@ -430,4 +430,73 @@ In main, we create 2 threads which both starts on this task
 ![alt text](SS/image16.png)
 
 As we can see in the result thread 1 started the task, completed then thread 2 started and completed the task. At a time, only 1 thread will execute the logic of the task.
+
+8. Back to our Library Counting task issue, there are several ways that we can implement synchronized keyword in Runnable implementing class: 
+
+- OPTION 1: synchronized method - we replace count++ in run() method with a synchronized method - here we create and call it incrementCount()
+
+```java
+@Override
+public void run(){
+    incrementCount();
+}
+
+private synchronized void incrementCount(){
+    count++;
+}
+```
+
+- OPTION 2: synchronized block of code
+
+```java
+@Override
+public void run(){
+    incrementCount();
+}
+private void incrementCount(){
+    synchronized(this){
+        count++;
+    }
+}
+```
+
+**NOTE**: Synchronized method is less favourable because synchronize has disadvantage that it slows down the process or introduces some lentency. Hence, when synchronized is unavoidable, for example, when we use Singleton pattern which only allows creation of 1 instance of the Singleton class at a time. In such case, we will limit the scope of synchronized as much as possible using only synchronized block of code
+
+In libraryCountTask: 
+
+```java
+package ExecutorService;
+
+public class LibraryCountTask implements Runnable{
+
+	private int count;
+	
+	public LibraryCountTask() {
+		count = 0;
+	}
+	
+	public int getCount() {
+		return count;
+	}
+	public void setCount(int count) {
+		this.count = count;
+	}
+	@Override
+	public void run() {
+		incrementCount();
+		
+	}
+
+	private void incrementCount() {
+		synchronized(this) {
+			count++;
+		}
+		
+	}
+	
+}
+```
+
+Now the results return 20000 people correctly.
+
 ## Stale data/ data inconsistency
