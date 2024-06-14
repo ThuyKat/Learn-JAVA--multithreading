@@ -25,6 +25,25 @@
 5. Various shutdown actions such as: cleaning up resources ( closing files, releasing network connections); ensuring all child threads are terminated gracefully; performing final logging or cleanup tasks
 6. One common way to ensure the main thread waits for child threads to complete is by using the join() method. This method blocks the main thread until the specified child thread terminates.
 
+# Two type of thread
+
+1. User-defined thread: is responsible for the execution of something required for your program such as calculation, get output, etc.
+
+2. Daemon thread: this thread is created when we start the program. It is created by JVM. 
+
+In order to make a thread daemon thread: 
+
+```java
+thread.setDaemon(true);
+...
+```
+
+- Characteristics of daemon thread: this thread will run in the background, hence your program will not wait for it to get completed. In other words, this is a low priority thread created by JVM to perform additional tasks such as gabage collection. Daemon thread will keep running eventhough your program has terminated. 
+
+- When to use daemon thread: when we don't want the task to block the main task in execution. 
+
+- One thing to note is that if we use thread.sleep() in other threads and let the daemon thread happens then it will happen before those other threads. Otherwise, if daemon has not completed its task when the main thread completed, it will keep running and not blocking the main thread, even in the case that daemon might throw an exeption. Daemon can complete its task either before or after main, but it wont affect main's operation. 
+
 # User-defined thread
  Two ways of creating a Thread: extending Thread class or implementing Runnable interface. 
 
