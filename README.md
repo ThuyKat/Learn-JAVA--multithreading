@@ -562,4 +562,9 @@ public class LibraryCountTask implements Runnable{
 
 }
 ```
+Using Atomic data type avoids issue with Synchronized that it improves performance of process. 
+
+Using Atomic also helps with data inconsitency issue
 ## Stale data/ data inconsistency
+
+Data inconsistency happens when  there are two threads t1 and t2 working on the same data at the same time, but performs different tasks: one is reading the data, the other is writing the data. T1 will not get any updates from what T2 is working on because T2 has its own copy of the data. In other words, data inconsistency happens when we are storing local copies for each thread that execute each copy at different location ( in CPU register or cache)
