@@ -645,3 +645,28 @@ Though data inconsistency is different to race condition, it can both happen in 
 
 ![alt text](SS/image19.png)
 
+NOTE: when dealing with basic data type such as int, long, double, etc, it is recommended to use Atomic data type. However when you have custom built object and you want to make sure multiple threads are not updating the value at the same time, we need to use **optimistic locking**
+
+The use of some database such as DynamoDB provides abilities to use optimistic locking and transactions ( will be discussed later in toptic about DB connection)
+
+# CALLABLE
+
+Callable works as the same maner as Runnable in creating tasks that can be submited to a threadpool. 
+
+With callable, you can specify the checked exception that you can throw and also the return type of your method. 
+
+![alt text](SS/image20.png)
+
+**callable V/S runnable**
+
+* Callable tasks can only be submited to ExecutorService, it cannot be used with a custom created Thread. 
+* Runnable implementing class has void return type, while callable has Future<T> return type. Future data type is used when you want to store the return value for future use ( by calling .get() method )
+
+**timeout**
+* In the example, the string res will wait for 1 second before starting next line
+* we can also specify waiting time : 
+```java
+String res1 = res.get(500,TimeUnit.MILLISECONDS);
+
+```
+NOTE: The .get() call only blocks the thread that calls it(the main thread), it does not block other threads in ExecutorService from running.
