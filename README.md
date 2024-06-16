@@ -567,4 +567,65 @@ Using Atomic data type avoids issue with Synchronized that it improves performan
 Using Atomic also helps with data inconsitency issue
 ## Stale data/ data inconsistency
 
-Data inconsistency happens when  there are two threads t1 and t2 working on the same data at the same time, but performs different tasks: one is reading the data, the other is writing the data. T1 will not get any updates from what T2 is working on because T2 has its own copy of the data. In other words, data inconsistency happens when we are storing local copies for each thread that execute each copy at different location ( in CPU register or cache)
+Data inconsistency happens when  there are two or more threads, for example, t1 and t2 working on the same data at the same time. What happens is that T1 will not get any updates from what T2 is working on, because T2 has its own copy of the data. 
+
+We can demonstrate how this happen by creating a process that involves two tasks: 
+-  Read data and Write data performing on a single common data source. 
+-  Read-data is only evoked when the data is changed. This happens only when data is updated by the Write-data method. Hence the connectness of Read-data result depends on whether Read-data happens at the right time, right after Write-data is done. 
+-  These two tasks will be performed by different Threads 
+
+```java
+package ExecutorService;
+
+public class RunnableMemoryConsistency implements Runnable {
+
+	// specify the type of task: "R" or "W"
+	private String type;
+
+	// this represents the data shared between instances of the class
+	private static int data = 0;
+
+	RunnableMemoryConsistency(String type) {
+		this.type = type;
+	}
+
+	// if "W" : increment data to 5
+	// if "R" : read the data whenever it is incremented
+
+	@Override
+	public void run() {
+		if ("W".equals(type)) {
+			while (data != 5) {
+				data++;
+				System.out.println("updated data to: " + data);
+			}
+
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				throw new RuntimeException(e);
+			}
+		} else {
+			int temp = 0;
+			while (true) {
+				if (temp != data) {
+					temp = data;
+					System.out.println("Have read new data: " + temp);
+				}
+			}
+		}
+
+	}
+
+}
+```
+
+We use ExecutorService to create a FixedThreadPool(2): 
+
+![alt text](SS/image17.png)
+
+As you can see the return results, Read-data is not correctly evoked  when data is updated to 4, and it is even called before Write-data's operation. 
+
+Since these two tasks are performed by two different threads, operated in different locations in system memory on different copies of the data, data information is reported inconsistently and incorrectly. 
+
