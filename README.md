@@ -625,7 +625,23 @@ We use ExecutorService to create a FixedThreadPool(2):
 
 ![alt text](SS/image17.png)
 
-As you can see the return results, Read-data is not correctly evoked  when data is updated to 4, and it is even called before Write-data's operation. 
+As you can see the return results, Read-data is not correctly evoked  when data is updated to 4, and it is even called before Write-data's operation. Notice that we even implement Thread.sleep(1000) in Write-data to wait for Read-data to update value.
 
 Since these two tasks are performed by two different threads, operated in different locations in system memory on different copies of the data, data information is reported inconsistently and incorrectly. 
+
+**fixing the issue with volatile data**
+
+By using volatile type data, we can keep the data used for tasks' operation at the same place so there is no local copies which are maintained by multiple threads. 
+
+![alt text](SS/image18.png)
+
+We can see now the result is read correctly. 
+
+NOTE: data inconsistency is different to race condition. In previous example about race condition, we have 1 instance of Runnable implementing class being run on 2 different Threads to perform the same task. In this example, we have two instances of the Runnable implementing class being submited and run on 2 different Threads to perform a sequence of two tasks. 
+
+**fixing the issue with atomic data type**
+
+Though data inconsistency is different to race condition, it can both happen in a process. Using atomic data type ( like previously shown) handle them both. However using valatile data, we can only handle data inconsistency issue. 
+
+![alt text](SS/image19.png)
 
