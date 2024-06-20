@@ -671,10 +671,18 @@ String res1 = res.get(500,TimeUnit.MILLISECONDS);
 ```
 NOTE: The .get() call only blocks the thread that calls it(the main thread), it does not block other threads in ExecutorService from running.
 
-# COMPLETABLE FUTURE VS FUTURE
+#  FUTURE, COMPLETABLE FUTURE
 
-**Future**
+## FUTURE
+
 Future provides a way to retrieve the result of a computation once it is completed
 
 Methods of Futures include: 
 1) .get() : retrieve the result of the computation, waiting if it is necessary for the computation to finish
+2) .get(long timeout, TimeUnit.unit): retrieve the result, waiting up to the specified timeout if necessary
+3) .isDone(): checks if the computation is completed
+
+Issues with Futures: 
+1) it is impossible to chain multiple Futures together. In other words, you canno easily create a sequence of dependent asynchronous task where the output of one task is fed into the next.
+2) Lack of exception handling
+3) Everytime when you  want a response from Future call, you must block the main thread then invoke the next.
