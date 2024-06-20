@@ -670,3 +670,11 @@ String res1 = res.get(500,TimeUnit.MILLISECONDS);
 
 ```
 NOTE: The .get() call only blocks the thread that calls it(the main thread), it does not block other threads in ExecutorService from running.
+
+# COMPLETABLE FUTURE VS FUTURE
+
+**Future**
+Future provides a way to retrieve the result of a computation once it is completed
+
+Methods of Futures include: 
+1) .get() : retrieve the result of the computation, waiting if it is necessary for the computation to finish
