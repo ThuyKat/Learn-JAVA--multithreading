@@ -813,5 +813,27 @@ One important note is that eventhough each of the method is using different Thre
 
 **EXCEPTION HANDLING**
 
+Notice that whatever exception we stated at main method, we will throw errors at .get() method. 
 
+For example, we have a Runtime Exception in supplyAsync like below: 
+
+![alt text](SS/image22.png)
+
+However now we can use: . exceptionally() and .handle() to provide a way to handle such exception. 
+
+1. exceptionally() : can be used after supplyAsync() or any other methods to handle exception. It will only be evoked when there is an exception. 
+
+![alt text](SS/image23.png)
+
+As we can see, now .get() will not throw any exception and exception from previous supplyAsync operation is captured by Throwable t. 
+
+2. handle() : different to exceptionally(), handle() will always be evoked because it has two arguments : a return value if previous operations run successfully, and a throwable if there is any exception occurs. 
+
+![alt text](SS/image24.png)
+
+- return value "s" in the code is the return value from previous operation supplyAsync. s is null because the previous operation returns an exception.
+
+- NOTE: both .exceptionally() and .handle() is not necessary the last block, it can be put multiple times after any callback methods to handle exception. 
+
+- If we want to handle resource, we should put inside a try() block rather than relying on Completable Future's methods to ensure resources to be cleaned up for closed once operations are completed, regardless of the outcome ( either exception or a valid return value). While .exceptionally() and handle() can handle exceptions, they do not manage the resources directly, which leads to complex code because resource can open longer than required when .handle() deals with multiple potential outcomes.In this case, try-with-resource guarantees that resources are closed in all execution paths. 
 
