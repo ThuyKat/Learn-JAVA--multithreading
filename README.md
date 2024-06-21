@@ -1,17 +1,17 @@
 # Learn-JAVA--multithreading
 
-# Process vs Thread
+# PROCESS VS THREAD
 1. Process is a software or a program which include multiple functionalities. Each process will have a separate memory space, resources allocated so that you can complete tasks. 
 2. Thread is a segment of a process. In a process, multiple threads can present. Each thread can perform, for example, a functionality of the software. 
 3. Threads will be working sequentially or concurrently in order to complete tasks of the process. 
 
-# Multitasking
+# MULTITASKING
 1. Means doing multiple tasks simlutenously. In computing,we want to multitasking because we want to utilise the CPU processing power efficiently. We can complete more tasks within shorter time and reduce the idle time. This comes down to handling user-request at a faster pace.
 2. Multitasking includes multiprocessing and multithreading
 3. Multi-processing means multiple programs/ applicaitons running concurrently on your computer. Each time you start an applications ( browser, MS word, etc) a process is created. When you start multiple applications, multiple processes are created and running cocurrently on your system. If a process is crashed, it wont affect the others. 
 4. Multi-threading allows parts of the program running concurrently ( e.g: watching the video + listening to the audio of the video).One thread might be responsible for playing the video, another thread is responsible for playing the audio. If one thread is crashed, it will affect the other thread because threads need to work together to complete the major task.  
 
-# Multi-threading in JAVA 
+# MULTI-THREADING IN JAVA 
 
 1. In Java, it can be achieved via Thread class. 
 2. Thread scheduler decides which thread to run and which thread to wait
@@ -22,7 +22,7 @@
 Runtime.getRuntime().availableProcessors();
 ```
 
-# Main thread
+# MAIN THREAD
 1. When Java program starts, one thread is created by JVM automatically and it run immediately. This thread is "main" thread. When we write a program and run without creating a new thread, we are running in single thread environment.
 2. Main thread is responsible for starting the program, setting up necs resources and spawning child threads to perform concurent tasks.   
 3. Main thread is normally where we create a new thread ( spawn a new thread). The new thread created is called a child thread of the main thread
@@ -30,7 +30,7 @@ Runtime.getRuntime().availableProcessors();
 5. Various shutdown actions such as: cleaning up resources ( closing files, releasing network connections); ensuring all child threads are terminated gracefully; performing final logging or cleanup tasks
 6. One common way to ensure the main thread waits for child threads to complete is by using the join() method. This method blocks the main thread until the specified child thread terminates.
 
-# Two types of thread
+# TWO TYPES OF THREAD
 
 1. User-defined thread: is responsible for the execution of something required for your program such as calculation, get output, etc.
 
@@ -51,7 +51,7 @@ thread.setDaemon(true);
 
 - Daemon threads are also called service provider threads which provide service to the user thread
 
-# User-defined thread
+# USER DEFINED THREAD
  Two ways of creating a Thread: extending Thread class or implementing Runnable interface. 
 
  ## creating a thread as a child of the Thread class
@@ -686,3 +686,132 @@ Issues with Futures:
 1) it is impossible to chain multiple Futures together. In other words, you canno easily create a sequence of dependent asynchronous task where the output of one task is fed into the next.
 2) Lack of exception handling
 3) Everytime when you  want a response from Future call, you must block the main thread then invoke the next.
+
+## COMPLETABLE FUTURE
+Completable Future represents a future result of an asynchronous computation. It resolves issues that previously unable to handle with Future. 
+
+**CHAINING MULTIPLE FUTURES**
+
+Completable Future provides callbalck functions which allow you to specify actions that should be taken when the future is completed after runasync() or supplyasync() 
+
+**runasync() : is used when you do not want to return anything from your code
+
+![alt text](SS/image21.png)
+
+**supplyasync() : is used when you want to return something from your code
+
+```java
+	CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(new Supplier<String>() {
+
+			@Override
+			public String get() {
+				// TODO Auto-generated method stub
+				return "SUPPLY ASYNC";
+			}
+			
+		});
+```
+We notice that since cf1 does not have any further callback functions after supplyAsync(), return of get() method should match to whaever type you specify in CompletableFuture declaration for cf1. 
+
+If you do have callback functions, the type you declared for cf1 does not depend on what .supplyAsync is returning, it depends on what **your last method of execution returning**.
+
+Now if you want to perform further actions on the response of supplyAsync, Completable Future provides these callback function to create a chain of operations; 
+
+1. thenApply(): take output of supplyAsync and perform transformation on it and return back another output
+
+```java
+			CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(new Supplier<String>() {
+
+			@Override
+			public String get() {
+				// TODO Auto-generated method stub
+				return "SUPPLY ASYNC";
+			}
+
+		}).thenApply(new Function<String, String>() {
+
+			@Override
+			public String apply(String s) {
+				// TODO Auto-generated method stub
+				return s.concat(" - THEN APPLY ");
+			}
+
+		});
+
+		System.out.println(cf1.get());
+	}
+```
+NOTE: if we dont call response with .get(), main() can start before .thenApply() or whatever the callback functions. This is because supplyAsync() and thenApply() is running on other thread than main thread. However, supplyAsync() and thenApply() are running on the same thread ( just not the main thread)
+
+2. thenAccept() : takes the response from previous operations either supplyAsync or thenApply(), return nothing ( VOID return type). This operation is used over .thenApply(), for example, when you are getting a response after evoking an API call, you just want to add it to a List of responses to use later and dont want to return anything.
+
+```java
+CompletableFuture<Void> cf1 = CompletableFuture.supplyAsync(new Supplier<String>() {
+
+			@Override
+			public String get() {
+				// TODO Auto-generated method stub
+				return "SUPPLY ASYNC";
+			}
+
+		}).thenApply(new Function<String, String>() {
+
+			@Override
+			public String apply(String s) {
+				// TODO Auto-generated method stub
+				return s.concat(" - THEN APPLY ");
+			}
+
+		}).thenAccept(new Consumer<String>() {
+
+			@Override
+			public void accept(String t) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		})
+		
+				;
+
+		System.out.println(cf1.get());
+	}
+
+	
+}
+```
+
+3. thenRun(): does not take the response from previous operation, and does not return anyhing. This is used over thenAccept() and thenApply() when you want to perform an action which is independent of the response from previous step, e.g, print out metrics. 
+
+**MULTITHREADING IN COMPLETABLE FUTURE**
+
+We notice that all callback functions mentioned above are running on the same thread
+
+Now if we want it to be on different thread, we will create ExecutorService, for example: 
+```java
+ExecutorService ex = Executors.newFixedThreadPool(4);
+```
+Next, we add the executor service as an argument of supplyAsync, for example: 
+
+```java
+CompletableFuture<String> cf1 = CompletableFuture.supplyAsync(new Supplier<String>() {
+
+			@Override
+			public String get() {
+				// TODO Auto-generated method stub
+				return "SUPPLY ASYNC";
+			}
+			
+		}, ex );
+```
+
+About the remaining callback functions, we use: .thenApplyAsync() instead of thenApply(), thenAcceptAsync() instead of thenAccept(), and thenRunAsync() instead of thenRun(). 
+
+By including executor service as an argument, call back functions will use a thread created from the executor service. We can now control how many thread you are creating. 
+
+One important note is that eventhough each of the method is using different Thread, they still execute in order we wrote. 
+
+**EXCEPTION HANDLING**
+
+
+
