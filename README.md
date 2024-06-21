@@ -501,6 +501,50 @@ public class LibraryCountTask implements Runnable{
 
 Now the results return 20000 people correctly.
 
+**how synchronized keyword is used in Singleton**
+
+In multithreading environment, even with null check condition, if 2 threads at the same time evoke the getInstance() method - the global method of Singleton class and if at that time instance == null, both threads will try to create new instance of Logger class. 
+
+As mention above, we can either use synchronized keyword in method declaration, for example : public synchronised static Logger getInstance() OR we add a synchronized block inside the method: 
+```java
+synchronized(Logger.class){
+    if(instance == null){
+    instance = new Logger();
+    }
+}
+```
+NOTE: in Java, every class has a corresponding "class" object that represents the class' meta data. This class object is shared among all instances of that class. It is unique for a given calss within a JVM. This, Logger.class referes to the same object no matter where it is referenced. 
+By synchronizing on the "Logger.class" object, we are efectively ensure that the sync block is executed one thread at a time across all instances of the 'Logger' class. This is because the JVM uses the Logger.class object as a lock and allows only 1 thread to hold the lock at any given moment. Only the thread that holds the lock can evoke the instantiation.
+
+**thread-safe singleton with synchronized block**
+```java
+public class Logger{
+    private static Logger instance;
+
+    //private constructor to prevent instantiation
+    private Logger(){
+
+    }
+
+    public static Logger getInstance(){
+        if(instance == null){
+            synchronized(Logger.class){
+                if(instance == null){ // Double-checking locking
+                    instance = new Logger();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void log(String message){
+        synchronized(Logger.class){
+            //Code to write the log message to a file or console
+            System.out.println(message);
+        }
+    }
+}
+
 **fixing the issue with atomic data type**
 
 1. Instead of using "private int count;", now we can change it to " private AtomicInteger count;"
