@@ -544,7 +544,7 @@ public class Logger{
         }
     }
 }
-
+```
 **fixing the issue with atomic data type**
 
 1. Instead of using "private int count;", now we can change it to " private AtomicInteger count;"
